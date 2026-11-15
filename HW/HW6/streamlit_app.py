@@ -8,21 +8,25 @@ import os
 # 1. 페이지 레이아웃 설정 (와이드 모드)
 st.set_page_config(layout="wide", page_title="Object Counting & Filtering System")
 
-st.title("📦 Filtering 시스템")
-st.write("사이드바의 슬라이더를 조절하며 배경 노이즈를 잡고 물체들을 검출해 보세요.")
+st.title("📦 LPF 및 Morphology 기반 Object Counting 시스템")
+st.write("사이드바의 슬라이더를 조절하며 배경 노이즈를 잡고 나뭇잎들을 검출해 보세요.")
 
 # =====================================================================
 # 🎛️ 사이드바 영역: 이미지 선택 및 필터링 파라미터 조절
 # =====================================================================
 st.sidebar.header("📁 이미지 및 필터 설정")
 
-# 1) 현재 폴더에 있는 이미지(.jpg, .jpeg, .png) 자동 검색
+# 현재 .py 파일이 위치한 실제 폴더 경로를 기준으로 설정 (배포 환경 경로 문제 해결)
+current_dir = os.path.dirname(os.path.abspath(__file__))
+
+# 1) 현재 .py 파일이 있는 폴더 안의 이미지(.jpg, .jpeg, .png) 자동 검색
 image_extensions = (".jpg", ".jpeg", ".png")
-image_files = [f for f in os.listdir(".") if f.lower().endswith(image_extensions)]
+image_files = [f for f in os.listdir(current_dir) if f.lower().endswith(image_extensions)]
 
 if image_files:
     selected_image_name = st.sidebar.selectbox("📂 이미지 선택하기", image_files)
-    target_image_path = selected_image_name
+    # 파일 절대 경로 지정
+    target_image_path = os.path.join(current_dir, selected_image_name)
 else:
     st.sidebar.warning("현재 폴더에 이미지 파일이 없습니다. 사진들을 코드와 같은 폴더에 넣어주세요!")
     target_image_path = None
@@ -74,14 +78,13 @@ if target_image_path is not None:
     )
     
     # 📍 OpenCV 컨투어(Contour) 분석을 통한 객체 카운팅 수행
-    # result_binary는 0과 255값을 가지므로 uint8 변환 후 컨투어 검출
     contours, _ = cv2.findContours(result_binary.astype(np.uint8), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     
     # 지정한 최소 크기(min_area) 이상의 객체만 필터링하여 카운트
     valid_contours = [c for c in contours if cv2.contourArea(c) >= min_area]
     num_objects = len(valid_contours)
     
-    # 객체 시각화를 위해 원본 이미지 복사 후 컨투어 드로잉
+    # 객체 시각화를 위해 원본 이미지 로드 후 컨투어 드로잉
     color_img_cv = cv2.cvtColor(cv2.imread(target_image_path), cv2.COLOR_BGR2RGB)
     cv2.drawContours(color_img_cv, valid_contours, -1, (0, 255, 0), 2)
 
@@ -103,7 +106,7 @@ if target_image_path is not None:
         st.image(color_img_cv, use_column_width=True)
         
     st.markdown("---")
-    st.success(f"🎯 **Counting Result**: 현재 선택된 파일(**{selected_image_name}**)에서 검출된 객체 개수는 총 **{num_objects}개**입니다.")
+    st.success(f"🎯 **Counting Result**: 현재 선택된 파일(**{selected_image_name}**)에서 검출된 객체(나뭇잎) 개수는 총 **{num_objects}개**입니다.")
     
 else:
-    st.info("👈 사이드바에 표시될 이미지 파일들을 `.py` 파일과 같은 폴더에 넣어주세요!")
+    st.info("👈 사이드바에 표시될 이미지 파일들을 코드 파일과 같은 폴더에 넣어주세요!")
