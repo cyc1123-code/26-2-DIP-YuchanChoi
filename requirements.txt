@@ -1,5 +1,5 @@
 streamlit
-cv2
+pillow
 numpy
-PIL
-os
+scipy
+opencv-python-headless
