@@ -1,2 +1,5 @@
 streamlit
-pillow
+cv2
+numpy
+PIL
+os
