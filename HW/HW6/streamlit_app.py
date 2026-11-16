@@ -8,8 +8,8 @@ import os
 # 1. 페이지 레이아웃 설정 (와이드 모드)
 st.set_page_config(layout="wide", page_title="Object Counting & Filtering System")
 
-st.title("📦 LPF 및 Morphology 기반 Object Counting 시스템")
-st.write("사이드바의 슬라이더를 조절하며 배경 노이즈를 잡고 나뭇잎들을 검출해 보세요.")
+st.title("📦 Filtering 시스템")
+st.write("사이드바의 슬라이더를 조절하며 배경 노이즈를 잡고 물체들을 검출해 보세요.")
 
 # =====================================================================
 # 🎛️ 사이드바 영역: 이미지 선택 및 필터링 파라미터 조절
